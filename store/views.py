@@ -91,10 +91,10 @@ def processOrder(request):
 	if request.user.is_authenticated:
 		customer = request.user.customer
 		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		total = data['form']['total']
+		total = float(data['form']['total'])
 		order.transaction_id = transaction_id
 
-		if total == order.get_cart_total:
+		if total == float(order.get_cart_total):
 			order.complete = True
 		order.save()
 
@@ -105,8 +105,8 @@ def processOrder(request):
 				address = data['shipping']['address'],
 				city = data['shipping']['city'],
 				estate = data['shipping']['estate'],
-				phone = data['shipping']['phone'],
+				phone = data['shipping']['phone']
 			)
 	else:
-		print("User is not logged in....")
+		print('User is not logged in....')
 	return JsonResponse('Payment was submitted ...', safe=False)

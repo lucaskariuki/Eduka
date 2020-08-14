@@ -48,7 +48,7 @@
 
   <div class="col-lg-6">
     <div class="box-element">
-      <a class="btn btn-outline-dark" href="{% url 'store:cart' %}">&#x2190; Back to Cart</a>
+      <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
       <hr>
       <h3>Order Summary</h3>
       <hr>
@@ -82,7 +82,7 @@
   }
 
   if (user != 'AnonymousUser') {
-    document.getElementById('shipping-info').innerHTML = ''
+    document.getElementById('user-info').innerHTML = ''
   }
 
   if (shipping == 'False' && user != 'AnonymousUser') {
@@ -93,20 +93,59 @@
   }
 
   var form = document.getElementById('form')
-		form.addEventListener('submit', function(e){
-	    	e.preventDefault()
-	    	console.log('Form Submitted...')
-	    	document.getElementById('form-button').classList.add("hidden");
-	    	document.getElementById('payment-info').classList.remove("hidden");
-	    })
+  form.addEventListener('submit', function(e) {
+    e.preventDefault()
+    console.log('Form Submitted...')
+    document.getElementById('form-button').classList.add("hidden");
+    document.getElementById('payment-info').classList.remove("hidden");
+  })
 
-    document.getElementById('make-payment').addEventListener('click', function(e){
-      submitFormData()
-	    })
+  document.getElementById('make-payment').addEventListener('click', function(e) {
+    submitFormData()
+  })
 
 
-  function submitFormData(){
+  function submitFormData() {
     console.log("payment button clicked, sending data....")
+
+    var userFormData = {
+      'name':null,
+      'email':null,
+      'total':total,
+    }
+
+    var shippingInfo = {
+      'address':null,
+      'city':null,
+      'estate':null,
+      'phone':null,
+    }
+    if (shipping != 'False'){
+      shippingInfo.address = form.address.value
+      shippingInfo.city = form.city.value
+      shippingInfo.estate = form.estate.value
+      shippingInfo.phone = form.phone.value
+    }
+    if(user == 'AnonymousUser'){
+      userFormData.name = form.name.value
+      userFormData.email = form.email.value
+    }
+
+    var url = '/process_order/'
+    fetch(url, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-CSRFToken':csrftoken,
+      },
+      body:JSON.stringify({'form':userFormData, 'shipping':shippingInfo})
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      alert('Transaction completed');
+      window.location.href = "{% url 'store' %}"
+    })
   }
 </script>
 

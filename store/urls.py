@@ -7,7 +7,6 @@ from .views import (
 		processOrder
 	)
 
-app_name = "store"
 
 urlpatterns = [
 	path('', store, name = "store"),
